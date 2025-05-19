@@ -1,0 +1,27 @@
+from collections import deque
+
+class Solution:
+    def shortestPathLength(self, graph):
+        n = len(graph)
+        queue = deque()
+        visited = set()
+
+        # 初始化：每個節點作為起點（多源BFS）
+        for i in range(n):
+            mask = 1 << i
+            queue.append((i, mask, 0))
+            visited.add((i, mask))
+
+        # BFS
+        while queue:
+            node, mask, steps = queue.popleft()
+
+            # 全部節點都訪問過了
+            if mask == (1 << n) - 1:
+                return steps
+
+            for nei in graph[node]:
+                next_mask = mask | (1 << nei)
+                if (nei, next_mask) not in visited:
+                    visited.add((nei, next_mask))
+                    queue.append((nei, next_mask, steps + 1))
