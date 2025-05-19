@@ -1,0 +1,30 @@
+class Solution:
+    def findOrder(self, numCourses, prerequisites):
+        graph = [[] for _ in range(numCourses)]
+        for a, b in prerequisites:
+            graph[b].append(a)
+
+        visited = [0] * numCourses
+        result = []
+        self.has_cycle = False
+
+        def dfs(node):
+            if visited[node] == 1:
+                self.has_cycle = True
+                return
+            if visited[node] == 2:
+                return
+
+            visited[node] = 1
+            for neighbor in graph[node]:
+                dfs(neighbor)
+            visited[node] = 2
+            result.append(node)
+
+        for i in range(numCourses):
+            if visited[i] == 0:
+                dfs(i)
+                if self.has_cycle:
+                    return []
+
+        return result[::-1]
