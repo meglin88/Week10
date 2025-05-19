@@ -1,0 +1,48 @@
+class Solution:
+    def findRedundantDirectedConnection(self, edges):
+        parent = {}
+        cand1 = []
+        cand2 = []
+
+        for u, v in edges:
+            if v in parent:
+                # 找到有兩個父親的節點
+                cand1 = [parent[v], v]
+                cand2 = [u, v]
+                break
+            parent[v] = u
+
+        # Union-Find
+        def find(u, root):
+            while root[u] != u:
+                root[u] = root[root[u]]
+                u = root[u]
+            return u
+
+        # 試著刪掉 cand2，看是否有環
+        def union_find(skip_edge):
+            root = list(range(len(edges) + 1))
+            for u, v in edges:
+                if [u, v] == skip_edge:
+                    continue
+                pu, pv = find(u, root), find(v, root)
+                if pu == pv:
+                    return [u, v]  # found cycle
+                root[pv] = pu
+            return []
+
+        if cand1:
+            # 如果有雙父邊
+            cycle = union_find(cand2)
+            if cycle:
+                return cand1
+            else:
+                return cand2
+        else:
+            # 沒有雙父邊，就找第一個形成 cycle 的邊
+            root = list(range(len(edges) + 1))
+            for u, v in edges:
+                pu, pv = find(u, root), find(v, root)
+                if pu == pv:
+                    return [u, v]
+                root[pv] = pu
